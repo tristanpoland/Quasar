@@ -89,9 +89,9 @@ export const useFileSystem = () => {
     const readFile = async (path) => {
         if (!isLoaded) return;
         try {
-            return await api.fs.readTextFile(path);
+            return await api.fs.readTextFile(currentProject+ "/" + path);
         } catch (err) {
-            throw new Error(`Failed to read file: ${err}`);
+            throw new Error(`Failed to read file from path: ${path}: ${err}`);
         }
     };
 

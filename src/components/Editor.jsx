@@ -32,6 +32,23 @@ const languageMap = {
   xml: xml(),
 };
 
+const chalky = "#e5c07b"
+const coral = "#ff5252"
+const cyan = "#56b6c2"
+const invalid = "#ffffff"
+const ivory = "#abb2bf"
+const stone = "#7d8799"
+const malibu = "#61afef"
+const sage = "#98c379"
+const whiskey = "#d19a66"
+const violet = "#c678dd"
+const darkBackground = "#000000"
+const highlightBackground = "#15151f"
+const background = "#000000"
+const tooltipBackground = "#15151f"
+const selection = "#28284e"
+const cursor = "#528bff"
+
 export const Editor = ({ content, language, onChange }) => {
   const editorRef = useRef(null);
   const viewRef = useRef(null);
@@ -55,10 +72,77 @@ export const Editor = ({ content, language, onChange }) => {
           }
         }),
         EditorView.theme({
-          '&': { height: '100%' },
-          '.cm-scroller': { overflow: 'auto' },
-          '.cm-content': { fontFamily: 'JetBrains Mono, monospace' },
-        }),
+          '&': {
+            height: '100%',
+            overflow: 'scroll',
+            color: ivory,
+            backgroundColor: background,
+          },
+        
+          '.cm-content': {
+            fontFamily: 'JetBrains Mono, monospace',
+            caretColor: cursor,
+          },
+        
+          '.cm-cursor, .cm-dropCursor': { borderLeftColor: cursor },
+          '&.cm-focused .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection': {
+            backgroundColor: selection,
+          },
+        
+          '.cm-panels': { backgroundColor: darkBackground, color: ivory },
+          '.cm-panels.cm-panels-top': { borderBottom: '2px solid black' },
+          '.cm-panels.cm-panels-bottom': { borderTop: '2px solid black' },
+        
+          '.cm-searchMatch': {
+            backgroundColor: '#72a1ff59',
+            outline: '1px solid #457dff',
+          },
+          '.cm-searchMatch.cm-searchMatch-selected': {
+            backgroundColor: '#6199ff2f',
+          },
+        
+          '.cm-activeLine': { backgroundColor: highlightBackground },
+          '.cm-selectionMatch': { backgroundColor: '#aafe661a' },
+        
+          '&.cm-focused .cm-matchingBracket, &.cm-focused .cm-nonmatchingBracket': {
+            backgroundColor: '#bad0f847',
+          },
+        
+          '.cm-gutters': {
+            backgroundColor: background,
+            color: stone,
+            border: 'none',
+          },
+        
+          '.cm-activeLineGutter': {
+            backgroundColor: highlightBackground,
+          },
+        
+          '.cm-foldPlaceholder': {
+            backgroundColor: 'transparent',
+            border: 'none',
+            color: '#ddd',
+          },
+        
+          '.cm-tooltip': {
+            border: 'none',
+            backgroundColor: tooltipBackground,
+          },
+          '.cm-tooltip .cm-tooltip-arrow:before': {
+            borderTopColor: 'transparent',
+            borderBottomColor: 'transparent',
+          },
+          '.cm-tooltip .cm-tooltip-arrow:after': {
+            borderTopColor: tooltipBackground,
+            borderBottomColor: tooltipBackground,
+          },
+          '.cm-tooltip-autocomplete': {
+            '& > ul > li[aria-selected]': {
+              backgroundColor: highlightBackground,
+              color: ivory,
+            },
+          },
+        }, { dark: true })
       ]
     });
 

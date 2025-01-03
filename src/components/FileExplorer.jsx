@@ -41,12 +41,8 @@ export const FileExplorer = ({
   }, [isDragging]);
 
   return (
-    <div
-      className="bg-black border-r border-gray-900 flex flex-col relative"
-      style={{ width: `${sidebarWidth}px` }}
-      ref={dragRef}
-    >
-      <div className="p-4 text-xs text-gray-400 font-medium flex items-center justify-between">
+    <div className='overflow-scroll'>
+      <div className="p-4 text-xs text-gray-400 font-medium flex items-center justify-between sticky top-0 z-10 bg-black/15 backdrop-blur-sm overflow-scroll">
         <span>EXPLORER</span>
         <Plus
           size={16}
@@ -54,12 +50,15 @@ export const FileExplorer = ({
           onClick={() => {/* TODO: Add new file creation */}}
         />
       </div>
-      <FileTree
-        items={files}
-        expandedFolders={expandedFolders}
-        onFileSelect={onFileSelect}
-        onFolderToggle={onFolderToggle}
-      />
+
+      <div className="overflow-auto flex-1">
+        <FileTree
+          items={files}
+          expandedFolders={expandedFolders}
+          onFileSelect={onFileSelect}
+          onFolderToggle={onFolderToggle}
+        />
+      </div>
       <div
         className="absolute h-full w-1 right-0 top-0 cursor-ew-resize hover:bg-indigo-500/20"
         onMouseDown={handleMouseDown}

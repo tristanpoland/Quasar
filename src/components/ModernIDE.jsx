@@ -9,7 +9,7 @@ import { CommandPalette } from '../components/CommandPalette';
 import { TabBar } from '../components/TabBar';
 import { MenuBar } from './MenuBar';
 import FileExplorer from './FileExplorer';
-import { FolderOpen, Save, Terminal, X, Split, Maximize } from 'lucide-react';
+import { FolderOpen, Save, Terminal, X, Split, Maximize, Search } from 'lucide-react';
 
 const ModernIDE = () => {
     // State
@@ -30,20 +30,61 @@ const ModernIDE = () => {
 
     const commands = [
       {
-        id: 'open-project',
-        name: 'Open Project',
-        shortcut: '⌘O',
-        action: handleOpenProject,
-        icon: FolderOpen
+      id: 'open-project',
+      name: 'Open Project',
+      shortcut: '⌘O',
+      action: handleOpenProject,
+      icon: FolderOpen
       },
       {
-        id: 'save',
-        name: 'Save File', 
-        shortcut: '⌘S',
-        action: handleFileSave,
-        icon: Save
+      id: 'save',
+      name: 'Save File', 
+      shortcut: '⌘S',
+      action: handleFileSave,
+      icon: Save
+      },
+      {
+      id: 'toggle-terminal',
+      name: 'Toggle Terminal',
+      shortcut: '⌘J',
+      action: () => console.log('Toggle terminal'),
+      icon: Terminal
+      },
+      {
+      id: 'split-editor',
+      name: 'Split Editor',
+      shortcut: '⌘\\',
+      action: () => setIsSplitView(!isSplitView),
+      icon: Split
+      },
+      {
+      id: 'maximize',
+      name: 'Toggle Maximize',
+      shortcut: '⌘M',
+      action: () => setWindowState(s => s === 'normal' ? 'maximized' : 'normal'),
+      icon: Maximize
+      },
+      {
+      id: 'close-file',
+      name: 'Close File',
+      shortcut: '⌘W',
+      action: () => activeFile && setOpenFiles(prev => prev.filter(f => f !== activeFile)),
+      icon: X
+      },
+      {
+      id: 'new-file',
+      name: 'New File',
+      shortcut: '⌘N',
+      action: () => console.log('New file'),
+      icon: FolderOpen
+      },
+      {
+      id: 'find',
+      name: 'Find in Files',
+      shortcut: '⌘F',
+      action: () => console.log('Find in files'),
+      icon: Search
       }
-      // ... add icons for other commands
     ];
   
     // File handling
@@ -123,7 +164,7 @@ const ModernIDE = () => {
     }, [handleKeyDown]);
   
     return (
-      <div className="w-full h-screen flex flex-col bg-black text-white overflow-hidden">
+      <div className="w-full h-screen flex flex-col bg-black text-white overflow-hidden max-h-full">
         <TitleBar
           windowState={windowState}
           toggleMaximize={() => setWindowState(s => s === 'normal' ? 'maximized' : 'normal')}
@@ -142,7 +183,7 @@ const ModernIDE = () => {
   
         <Notifications notifications={notifications} />
   
-        <div className={`flex flex-1 ${windowState === 'maximized' ? 'rounded-none' : 'rounded-lg m-2'}`}>
+        <div className={`flex flex-1 ${windowState === 'maximized' ? 'rounded-none' : 'rounded-lg m-2'} max-h-full pb-16`}>
           <FileExplorer
             files={files}
             expandedFolders={expandedFolders}
@@ -158,7 +199,7 @@ const ModernIDE = () => {
             setSidebarWidth={setSidebarWidth}
           />
   
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col max-h-full overflow-scroll">
             <TabBar
               openFiles={openFiles}
               activeFile={activeFile}
@@ -173,11 +214,11 @@ const ModernIDE = () => {
             />
   
             <div className="flex-1 flex">
-              <div className="flex-1">
+              <div className="flex-1 max-h-full overflow-scroll">
                 {activeFile && (
                   <Editor
                     content={fileContents[activeFile] || ''}
-                    language={getLanguageFromPath(activeFile)}
+                    language={"markdown"} //getLanguageFromPath(activeFile)
                     onChange={content => 
                       setFileContents(prev => ({
                         ...prev,

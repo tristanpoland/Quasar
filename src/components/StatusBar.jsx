@@ -23,18 +23,18 @@ export const StatusBar = ({ activeFile, gitBranch = 'main' }) => {
     };
    
     return (
-      <div className="h-8 bg-black border-t border-gray-900 flex items-center justify-between px-4 text-xs">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 text-indigo-400">
-            <GitBranch size={14} />
-            <span>{gitBranch}</span>
-          </div>
-          <span className="text-gray-500">No Issues</span>
+      <div className="h-8 bg-black/45 backdrop-blur-sm border-t border-gray-900 flex items-center justify-between px-4 text-xs absolute bottom-0 w-full">
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 text-indigo-400">
+        <GitBranch size={14} />
+        <span>{gitBranch}</span>
         </div>
-        <div className="flex items-center gap-4 text-gray-500">
-          <span>{getFileType(activeFile)}</span>
-          <span>UTF-8</span>
-        </div>
+        <span className="text-gray-500">No Issues</span>
+      </div>
+      <div className="flex items-center gap-4 text-gray-500">
+        <span>{getFileType(activeFile)}</span>
+        <span>UTF-8</span>
+      </div>
       </div>
     );
    };
