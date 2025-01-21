@@ -9,6 +9,9 @@
   "parserOptions": {
     "project": ["./tsconfig.json"]
   },
+  "compilerOptions" {
+    "allowJs": true
+  },
   "plugins": ["@typescript-eslint"],
   "rules": {
     // Your existing rules
