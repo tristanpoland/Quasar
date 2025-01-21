@@ -411,43 +411,60 @@ const Quasar = () => {
     }
   };
 
+  // Optimized loadDirectoryStructure function
   const loadDirectoryStructure = async () => {
     try {
       setIsLoading(true);
       const dirHandle = await window.showDirectoryPicker();
       
-      const processDirectory = async (handle, path = '') => {
+      // Process directory with lazy loading
+      const processDirectory = async (handle, path = '', depth = 0) => {
         const entries = [];
+        // Only load immediate children for depths > 2
+        const shouldLoadChildren = depth <= 2;
+        
+        // Use for...of instead of collecting all entries first
         for await (const entry of handle.values()) {
           const entryPath = path ? `${path}/${entry.name}` : entry.name;
+          
           if (entry.kind === 'directory') {
             const childHandle = await handle.getDirectoryHandle(entry.name);
+            fileHandles.set(entryPath, childHandle);
+            
+            // Only process children if we're at a shallow depth
+            const children = shouldLoadChildren ? 
+              await processDirectory(childHandle, entryPath, depth + 1) : 
+              [];
+              
             entries.push({
               name: entry.name,
               path: entryPath,
               type: 'directory',
-              children: await processDirectory(childHandle, entryPath),
+              children,
               open: false,
-              handle: childHandle
+              handle: childHandle,
+              // Flag to indicate if children need to be loaded
+              hasUnloadedChildren: !shouldLoadChildren
             });
           } else {
             const fileHandle = await handle.getFileHandle(entry.name);
+            fileHandles.set(entryPath, fileHandle);
             entries.push({
               name: entry.name,
               path: entryPath,
               type: 'file',
               handle: fileHandle
             });
-            fileHandles.set(entryPath, fileHandle);
           }
         }
+        
         return entries.sort((a, b) => {
           if (a.type === 'directory' && b.type !== 'directory') return -1;
           if (a.type !== 'directory' && b.type === 'directory') return 1;
           return a.name.localeCompare(b.name);
         });
       };
-
+    
       const structure = await processDirectory(dirHandle);
       setFiles(structure);
       setCurrentProjectPath(dirHandle.name);
@@ -468,6 +485,56 @@ const Quasar = () => {
       }]);
     } finally {
       setIsLoading(false);
+    }
+  };
+  
+  // Add this function to handle lazy loading of directory contents
+  const loadDirectoryChildren = async (item) => {
+    if (!item.hasUnloadedChildren || !item.handle) return;
+    
+    try {
+      const children = await processDirectory(item.handle, item.path, 0);
+      
+      setFiles(prev => {
+        const updateItem = (items) =>
+          items.map(i =>
+            i.path === item.path
+              ? { ...i, children, hasUnloadedChildren: false }
+              : i.type === 'directory'
+                ? { ...i, children: updateItem(i.children || []) }
+                : i
+          );
+        return updateItem(prev);
+      });
+    } catch (error) {
+      console.error('Error loading directory contents:', error);
+      setConsoleOutput(prev => [...prev, {
+        type: 'error',
+        message: `Error loading directory contents: ${error.message}`,
+        timestamp: new Date().toISOString()
+      }]);
+    }
+  };
+  
+  // Modify the FileTree click handler
+  const handleItemClick = async (item) => {
+    if (item.type === 'directory') {
+      if (item.hasUnloadedChildren) {
+        await loadDirectoryChildren(item);
+      }
+      setFiles(prev => {
+        const updateItem = (items) =>
+          items.map(i =>
+            i.path === item.path
+              ? { ...i, open: !i.open }
+              : i.type === 'directory'
+                ? { ...i, children: updateItem(i.children || []) }
+                : i
+          );
+        return updateItem(prev);
+      });
+    } else {
+      openFile(item);
     }
   };
 
